@@ -138,6 +138,9 @@ if __name__ == "__main__":
     if len(sys.argv) == 3:
         df = pd.read_csv(sys.argv[1])#.sample(frac=1).reset_index(drop=True)
         if df.columns.contains('verdict_code') == False:
+            print('CSV file must contain a column named ID')
+            sys.exit()
+        if df.columns.contains('verdict_code') == False:
             df['verdict_code'] = [-1 for n in range(len(df))]
         dfpath = sys.argv[1]
         file_dir = sys.argv[2]
