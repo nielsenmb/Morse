@@ -13,7 +13,4 @@ Morse will create a column in the csv that will contain the verdict code corresp
 - Maybe = 1
 - Bad = 0
 
-All targets are initially assigned 
-Unclassified = -1
-
-Any targets that Morse cannot find an image for will remain unclassified (-1).
+All targets are initially assigned Unclassified = -1. Any targets that Morse cannot find an image for will remain unclassified (-1).
