@@ -1,4 +1,4 @@
-# Morse
+# Morse - Inspect a directory full of images and assign Good/Bad/Maybe classes to each
 
 Setup
 1. Put images to inspect in a directory somewhere
