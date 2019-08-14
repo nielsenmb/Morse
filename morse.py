@@ -1,12 +1,8 @@
-#!/usr/bin/env python3
-
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QLabel
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QSizePolicy
-from PyQt5.QtGui import QIcon, QPixmap
-import sys
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
+from PyQt5.QtGui import QPixmap
+import sys, glob, os
 import pandas as pd
-import glob
-import os
 
 app = None
 
