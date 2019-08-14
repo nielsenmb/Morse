@@ -1,6 +1,8 @@
-# Morse
+# Morse 
 
-Setup
+### Inspect a directory full of images and assign Good/Bad/Maybe classes to each
+
+## Setup
 1. Put images to inspect in a directory somewhere
 2. Create a csv file (e.g. mytgts.csv) with at least a column named 'ID'. These IDs should be in the filenames of the images you want to inspect. Example: for myfavoritestar_tic1234567_isawesome.png, I would put 1234567 in the ID column of mytgts.csv.
 3. Inspect the images by
