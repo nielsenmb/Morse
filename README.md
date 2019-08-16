@@ -9,11 +9,11 @@
 $ python morse.py /path/to/mytgts.csv /dir/with/myimages
 
 Morse will create a column in the csv that will contain the verdict code corresponding to which button you press. The choices are:
-Good = 2
-Maybe = 1
-Bad = 0
+- Good = 2
+- Maybe = 1
+- Bad = 0
 
-All targets are initially assigned 
-Unclassified = -1
+All targets are initially assigned Unclassified = -1. Any targets that Morse cannot find an image for will remain unclassified (-1).
 
-Any targets that Morse cannot find an image for will remain unclassified (-1).
+# MORSE WILL PICK UP WHERE YOU LEFT OFF.
+Morse writes to the csv file every time you press one of the options, so if you close the inspection window and reopen it later, it will pick up where you left off. 
