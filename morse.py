@@ -81,7 +81,7 @@ class MyCentralWidget(QWidget):
                 print('If any unclassified targets remain, they may not have associated png files')
                 sys.exit()       
                    
-        id = str(int(self.main_window.df.loc[self.idx].ID))   
+        id =self.main_window.df.loc[self.idx].ID
                
         sfile = glob.glob(os.path.join(*[self.main_window.image_dir,'*%s*.png' % (id)]))
 
@@ -136,8 +136,8 @@ def main(df, dfpath, image_dir):
 
 if __name__ == "__main__":
     if len(sys.argv) == 3:
-        df = pd.read_csv(sys.argv[1])#.sample(frac=1).reset_index(drop=True)
-        if df.columns.contains('verdict_code') == False:
+        df = pd.read_csv(sys.argv[1], converters={'ID': str, 'verdict_code': int})
+        if df.columns.contains('ID') == False:
             print('CSV file must contain a column named ID')
             sys.exit()
         if df.columns.contains('verdict_code') == False:
@@ -146,4 +146,4 @@ if __name__ == "__main__":
         file_dir = sys.argv[2]
         main(df, dfpath, file_dir)
     else:
-        print('Usage: inspector.py <targets.csv> <image_dir>')
+        print('Usage: morse.py <targets.csv> <image_dir>')
