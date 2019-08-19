@@ -15,12 +15,12 @@ $ python morse.py /path/to/mytgts.csv /dir/with/myimages
 Use the ```--shuffle``` option to shuffle the targetlist. 
 
 Morse will create a column in mytgts.csv that will contain the verdict code corresponding to which button you press. The choices are:
-- _G_ood = 2
-- _M_aybe = 1
-- _B_ad = 0
-- _I_nteresting = 3
+- Good = 2
+- Maybe = 1
+- Bad = 0
+- Interesting = 3
 
-Buttons are hotkeyed to underscored characters.
+Hotkeys for each button are capitalized letters.
 
 All targets are initially assigned Unclassified = -1. Any targets that Morse cannot find an image for will remain unclassified (-1). There is also the option to just skip the image, in which case Morse will just assign -1. 
 
