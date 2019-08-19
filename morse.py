@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QLabel
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
 from PyQt5.QtGui import QPixmap
+from argparse import ArgumentParser
 import sys, glob, os
 import pandas as pd
 
@@ -16,8 +17,8 @@ class MyMainWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.resize(1600,900)
-        self.move(50,50)
+        self.resize(1600, 900)
+        self.move(50, 50)
         central_widget = MyCentralWidget(self, self.app)
         self.setCentralWidget(central_widget)
         self.setWindowTitle('ATL inspector')
@@ -150,16 +151,20 @@ def main(df, dfpath, image_dir):
     w.show()
     app.exit(app.exec_())
 
+parser = ArgumentParser()
+parser.add_argument('target_list', type=str)
+parser.add_argument('image_dir', type=str)
+
 if __name__ == "__main__":
-    if len(sys.argv) == 3:
-        df = pd.read_csv(sys.argv[1], converters={'ID': str, 'verdict_code': int})
-        if df.columns.contains('ID') == False:
-            print('CSV file must contain a column named ID')
-            sys.exit()
-        if df.columns.contains('verdict_code') == False:
-            df['verdict_code'] = [-1 for n in range(len(df))]
-        dfpath = sys.argv[1]
-        file_dir = sys.argv[2]
-        main(df, dfpath, file_dir)
-    else:
-        print('Usage: morse.py <targets.csv> <image_dir>')
+    args = parser.parse_args()
+
+    df = pd.read_csv(args.target_list, converters={'ID': str, 'verdict_code': int})
+
+    if df.columns.contains('ID') == False:
+        print('CSV file must contain a column named ID')
+        sys.exit()
+
+    if df.columns.contains('verdict_code') == False:
+        df['verdict_code'] = [-1 for n in range(len(df))]
+
+    main(df, args.target_list, args.image_dir)
