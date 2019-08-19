@@ -49,6 +49,14 @@ class MyCentralWidget(QWidget):
         bad_button.setShortcut('b')
         bad_button.clicked.connect(self.on_bad_button_clicked)
         
+        intr_button = QPushButton('&Interesting', self)
+        intr_button.setShortcut('i')
+        intr_button.clicked.connect(self.on_intr_button_clicked)
+        
+        skip_button = QPushButton('&Skip', self)
+        skip_button.setShortcut('S')
+        skip_button.clicked.connect(self.on_skip_button_clicked)
+        
         # define label
         self.label = QLabel(self)
         self.my_widget = MyWidget(self.label, self.main_window.df, self.main_window.image_dir)
@@ -57,8 +65,10 @@ class MyCentralWidget(QWidget):
         hbox = QHBoxLayout()
         hbox.addStretch(1)
         hbox.addWidget(good_button)
-        hbox.addWidget(may_button)
         hbox.addWidget(bad_button)
+        hbox.addWidget(may_button)
+        hbox.addWidget(intr_button)
+        hbox.addWidget(skip_button)
         hbox.addStretch(1)
         
         # place hbox and label into vbox
@@ -94,13 +104,19 @@ class MyCentralWidget(QWidget):
 
             
     def on_good_button_clicked(self):
-        self.write_verdict(2, 'Last jam was Good')
+        self.write_verdict(2, 'Last star was Good')
         
     def on_bad_button_clicked(self):
-        self.write_verdict(0, 'Last jam was Bad')
+        self.write_verdict(0, 'Last star was Bad')
         
     def on_may_button_clicked(self):
-        self.write_verdict(1, 'Last jam was Maybe')
+        self.write_verdict(1, 'Last star was Maybe')
+        
+    def on_intr_button_clicked(self):
+        self.write_verdict(3, 'Last star was...interesting...')
+    
+    def on_skip_button_clicked(self):
+        self.write_verdict(-1, 'Skipping image.')
     
     def write_verdict(self, err_code, mess):
         self.main_window.df.at[self.idx, 'verdict_code'] = err_code
