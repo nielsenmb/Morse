@@ -9,7 +9,7 @@ app = None
 
 class MyMainWindow(QMainWindow):
     def __init__(self, df, dfpath, image_dir, app,
-                 shuffle=True):
+                 shuffle=False):
         super().__init__()
         if shuffle:
             self.df = df.sample(frac=1).reset_index(drop=True)
