@@ -19,5 +19,11 @@ Morse will create a column in the csv that will contain the verdict code corresp
 
 All targets are initially assigned Unclassified = -1. Any targets that Morse cannot find an image for will remain unclassified (-1). There is also the option to just skip the image, in which case Morse will just assign -1. 
 
+## What do the verdict codes mean?
+- Good: Oscillation spectrum clearly shows excess, or 2DACF produces a clear peak in numax collapsogram
+- Maybe: Same as above, but to a less certain degree. Cases where better reduction could potentially produce better SNR
+- Bad: no oscillations in spectrum or ACFs
+- Interesting: There's something weird going on here, not solar-like oscillations but might be worth looking into
+
 # MORSE WILL PICK UP WHERE YOU LEFT OFF.
 Morse writes to the csv file every time you press one of the options, so if you close the inspection window and reopen it later, it will pick up where you left off. 
