@@ -1,23 +1,29 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QLabel
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
 from PyQt5.QtGui import QPixmap
+from argparse import ArgumentParser
 import sys, glob, os
 import pandas as pd
 
 app = None
 
 class MyMainWindow(QMainWindow):
-    def __init__(self, df, dfpath, image_dir, app):
+    def __init__(self, df, dfpath, image_dir, app,
+                 shuffle=False):
         super().__init__()
-        self.df = df  
+        if shuffle:
+            self.df = df.sample(frac=1).reset_index(drop=True)
+        else:
+            self.df = df
+
         self.dfpath = dfpath
         self.image_dir = image_dir
         self.app = app
         self.initUI()
 
     def initUI(self):
-        self.resize(1600,900)
-        self.move(50,50)
+        self.resize(1600, 900)
+        self.move(50, 50)
         central_widget = MyCentralWidget(self, self.app)
         self.setCentralWidget(central_widget)
         self.setWindowTitle('ATL inspector')
@@ -91,7 +97,7 @@ class MyCentralWidget(QWidget):
                 print('If any unclassified targets remain, they may not have associated png files')
                 sys.exit()       
                    
-        id =self.main_window.df.loc[self.idx].ID
+        id = self.main_window.df.loc[self.idx].ID
                
         sfile = glob.glob(os.path.join(*[self.main_window.image_dir,'*%s*.png' % (id)]))
 
@@ -138,7 +144,7 @@ class MyWidget():
         self.label.setPixmap(pixmap)
         self.label.setScaledContents(True)
 
-def main(df, dfpath, image_dir):
+def main(df, dfpath, image_dir, shuffle=True):
     '''
     app must be defined already!!!
     '''
@@ -146,20 +152,29 @@ def main(df, dfpath, image_dir):
     app = QApplication.instance()
     if app is None:
         app = QApplication(sys.argv)
-    w = MyMainWindow(df, dfpath, image_dir, app)
+    w = MyMainWindow(df, dfpath, image_dir, app, shuffle=shuffle)
     w.show()
     app.exit(app.exec_())
 
+parser = ArgumentParser()
+parser.add_argument('target_list', type=str)
+parser.add_argument('image_dir', type=str)
+parser.add_argument('--shuffle', action='store_true', dest='shuffle',
+                    help="shuffle the list of targets")
+parser.add_argument('--no-shuffle', action='store_false', dest='shuffle',
+                    help="don't shuffle the list of targets (default)")
+parser.set_defaults(feature=False)
+
 if __name__ == "__main__":
-    if len(sys.argv) == 3:
-        df = pd.read_csv(sys.argv[1], converters={'ID': str, 'verdict_code': int})
-        if df.columns.contains('ID') == False:
-            print('CSV file must contain a column named ID')
-            sys.exit()
-        if df.columns.contains('verdict_code') == False:
-            df['verdict_code'] = [-1 for n in range(len(df))]
-        dfpath = sys.argv[1]
-        file_dir = sys.argv[2]
-        main(df, dfpath, file_dir)
-    else:
-        print('Usage: morse.py <targets.csv> <image_dir>')
+    args = parser.parse_args()
+
+    df = pd.read_csv(args.target_list, converters={'ID': str, 'verdict_code': int})
+
+    if df.columns.contains('ID') == False:
+        print('CSV file must contain a column named ID')
+        sys.exit()
+
+    if df.columns.contains('verdict_code') == False:
+        df['verdict_code'] = [-1 for n in range(len(df))]
+
+    main(df, args.target_list, args.image_dir, shuffle=args.shuffle)

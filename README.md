@@ -25,5 +25,6 @@ All targets are initially assigned Unclassified = -1. Any targets that Morse can
 - Bad: no oscillations in spectrum or ACFs
 - Interesting: There's something weird going on here, not solar-like oscillations but might be worth looking into
 
-# MORSE WILL PICK UP WHERE YOU LEFT OFF.
-Morse writes to the csv file every time you press one of the options, so if you close the inspection window and reopen it later, it will pick up where you left off. 
+**Morse will pick up where you left off.**
+
+Morse writes to the CSV file every time you press one of the options, so if you close the inspection window and reopen it later, it will pick up where you left off. 
