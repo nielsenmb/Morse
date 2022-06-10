@@ -4,13 +4,14 @@ from PyQt5.QtGui import QPixmap
 from argparse import ArgumentParser
 import sys, glob, os
 import pandas as pd
+#from PyQt5 import QtCore, QtGui
 
 app = None
 
 class MyMainWindow(QMainWindow):
-    def __init__(self, df, dfpath, image_dir, app,
-                 shuffle=False):
+    def __init__(self, df, dfpath, image_dir, app, shuffle=True):
         super().__init__()
+
         if shuffle:
             self.df = df.sample(frac=1).reset_index(drop=True)
         else:
@@ -22,11 +23,18 @@ class MyMainWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.resize(1600, 900)
-        self.move(50, 50)
+        
+        self.setWindowTitle('Inspector')
+
+        self.setFixedWidth(1700)
+        self.setFixedHeight(1000)
+
+        #self.move(50, 50)
+        
         central_widget = MyCentralWidget(self, self.app)
+        
         self.setCentralWidget(central_widget)
-        self.setWindowTitle('ATL inspector')
+        
         self.statusBar().showMessage('Waiting...')
 
     def auto(self):
@@ -43,40 +51,52 @@ class MyCentralWidget(QWidget):
 
 
     def initUI(self):
-        good_button = QPushButton('&Good', self)
-        good_button.setShortcut('g')
-        good_button.clicked.connect(self.on_good_button_clicked)
+
+        smplMod_button = QPushButton('Sample models (&C)', self)
+        smplMod_button.setShortcut('C')
+        smplMod_button.clicked.connect(self.on_smplMod_button_clicked)
         
-        may_button = QPushButton('&Maybe', self)
-        may_button.setShortcut('m')
-        may_button.clicked.connect(self.on_may_button_clicked)
+        prMod_button = QPushButton('Prior model (&V)', self)
+        prMod_button.setShortcut('V')
+        prMod_button.clicked.connect(self.on_prMod_button_clicked)
         
-        bad_button = QPushButton('&Bad', self)
-        bad_button.setShortcut('b')
-        bad_button.clicked.connect(self.on_bad_button_clicked)
+
+ 
+
+        goodFit_button = QPushButton('Good (&G)', self)
+        goodFit_button.setShortcut('G')
+        goodFit_button.clicked.connect(self.on_osc_button_clicked)
+
+        badFit_button = QPushButton('Bad (&B)', self)
+        badFit_button.setShortcut('B')
+        badFit_button.clicked.connect(self.on_no_button_clicked)
         
-        intr_button = QPushButton('&Interesting', self)
-        intr_button.setShortcut('i')
-        intr_button.clicked.connect(self.on_intr_button_clicked)
-        
-        skip_button = QPushButton('&Skip', self)
+        hm_button = QPushButton('Hmmm (&H)', self)
+        hm_button.setShortcut('H')
+        hm_button.clicked.connect(self.on_hm_button_clicked)
+
+        skip_button = QPushButton('Sad bad data (&S)', self)
         skip_button.setShortcut('S')
         skip_button.clicked.connect(self.on_skip_button_clicked)
         
+
         # define label
         self.label = QLabel(self)
         self.my_widget = MyWidget(self.label, self.main_window.df, self.main_window.image_dir)
-        
+
         # Place the buttons - HZ
         hbox = QHBoxLayout()
         hbox.addStretch(1)
-        hbox.addWidget(good_button)
-        hbox.addWidget(bad_button)
-        hbox.addWidget(may_button)
-        hbox.addWidget(intr_button)
-        hbox.addWidget(skip_button)
+        hbox.addWidget(smplMod_button)
+        hbox.addWidget(prMod_button)
         hbox.addStretch(1)
-        
+        hbox.addWidget(goodFit_button)
+        hbox.addWidget(badFit_button)
+        hbox.addWidget(skip_button)
+        hbox.addWidget(hm_button)
+
+        hbox.addStretch(1)
+
         # place hbox and label into vbox
         vbox = QVBoxLayout()
         vbox.addWidget(self.label)
@@ -85,48 +105,72 @@ class MyCentralWidget(QWidget):
         self.next_image()
 
     def next_image(self):
-        
+
         self.idx += 1
-                
-        while self.main_window.df.loc[self.idx].verdict_code >= 0:
+
+        while self.main_window.df.loc[self.idx].flag >= 0:
 
             self.idx += 1
-            
+
             if (self.idx in self.main_window.df.index) == False:
                 print('Finished going through CSV file')
                 print('If any unclassified targets remain, they may not have associated png files')
-                sys.exit()       
-                   
+                sys.exit()
+
         id = self.main_window.df.loc[self.idx].ID
-               
-        sfile = glob.glob(os.path.join(*[self.main_window.image_dir,'*%s*.png' % (id)]))
+        
+        # There are two naming policies for pbjam figures currently in circulation
+        # This just checks for both of them.
+        self.smplModImg = glob.glob(os.path.join(*[self.main_window.image_dir, f'{id}_samples_model.png']))
 
-        if len(sfile)==0:
+        self.prModImg = glob.glob(os.path.join(*[self.main_window.image_dir, f'{id}_prior_model.png']))
+        
+
+        if len(self.smplModImg)==0:
             self.my_widget.show_image(os.path.join(*[os.getcwd(),'failed.jpg']))
-            print("*%s*.png not found, so I skipped it" % (id))
-            self.write_verdict(-1, "*%s*.png not found, so I skipped it" % (id))
-        else:
-            self.my_widget.show_image(sfile[0])
-
+            mess = f"{id}_samples_model.png not found, so I skipped it"
+            print(mess)
+            self.write_verdict(-1, mess)
+        else:    
+            self.my_widget.show_image(self.smplModImg[0])
+             
             
-    def on_good_button_clicked(self):
-        self.write_verdict(2, 'Last star was Good')
-        
-    def on_bad_button_clicked(self):
-        self.write_verdict(0, 'Last star was Bad')
-        
-    def on_may_button_clicked(self):
-        self.write_verdict(1, 'Last star was Maybe')
-        
-    def on_intr_button_clicked(self):
-        self.write_verdict(3, 'Last star was...interesting...')
-    
+
+    def on_smplMod_button_clicked(self):
+        self.my_widget.show_image(self.smplModImg[0])
+
+    def on_prMod_button_clicked(self):
+           if len(self.prModImg) == 0:
+               id = self.main_window.df.loc[self.idx].ID
+               message = f'No prior model plot for {id}'
+               self.main_window.statusBar().showMessage(message)
+           else:
+               try:
+                   self.my_widget.show_image(self.prModImg[0])
+               except:
+                   message = f'Failed to load prior model plot for {id}'
+                   self.main_window.statusBar().showMessage(message)
+                   
+  
+
+    def on_osc_button_clicked(self):
+        self.write_verdict(1, 'Last star was good')
+
+    def on_no_button_clicked(self):
+        self.write_verdict(0, 'Last star was bad')
+
     def on_skip_button_clicked(self):
         self.write_verdict(-1, 'Skipping image.')
-    
-    def write_verdict(self, err_code, mess):
-        self.main_window.df.at[self.idx, 'verdict_code'] = err_code
-        self.main_window.statusBar().showMessage(mess)
+        
+    def on_hm_button_clicked(self):
+        self.write_verdict(2, 'Last star was a hm')
+ 
+        
+
+    def write_verdict(self, code, mess):
+        self.main_window.df.at[self.idx, 'flag'] = code
+        perc = '%i / %i' % (self.idx, len(self.main_window.df))
+        self.main_window.statusBar().showMessage(perc + ' - ' + mess)
         self.main_window.df.to_csv(self.main_window.dfpath, index=False)
 
         if self.idx < len(self.main_window.df) - 1:
@@ -134,7 +178,7 @@ class MyCentralWidget(QWidget):
         else:
             self.main_window.statusBar().showMessage('Finished')
             sys.exit()
-    
+
 class MyWidget():
     def __init__(self, label, df, image_dir):
         self.label = label
@@ -168,13 +212,16 @@ parser.set_defaults(feature=False)
 if __name__ == "__main__":
     args = parser.parse_args()
 
-    df = pd.read_csv(args.target_list, converters={'ID': str, 'verdict_code': int})
+    df = pd.read_csv(args.target_list, converters={'ID': str, 'flag': int})
 
-    if df.columns.contains('ID') == False:
+    if len(df) > 100:
+        sys.setrecursionlimit(len(df))
+
+    if not 'ID' in df.columns:
         print('CSV file must contain a column named ID')
         sys.exit()
 
-    if df.columns.contains('verdict_code') == False:
-        df['verdict_code'] = [-1 for n in range(len(df))]
+    if not 'flag' in df.columns:
+        df['flag'] = [-1 for n in range(len(df))]
 
     main(df, args.target_list, args.image_dir, shuffle=args.shuffle)
