@@ -9,6 +9,9 @@ prior_data = pd.read_csv(os.path.join(*[workDir, 'prior_data.csv']))
 for i in prior_data.index:
 
     ID = prior_data.loc[i, 'ID']
+
+    if i%100 == 0:
+        print(i)
     
     fname = os.path.join(*[workDir, 'results', ID, ID+'_samples.npz'])
     
